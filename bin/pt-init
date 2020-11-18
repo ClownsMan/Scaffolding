@@ -1,0 +1,64 @@
+#!/usr/bin/env node
+
+const program = require('commander');
+const inquirer = require('inquirer');
+const downLoad = require('download-git-repo')
+const ora = require('ora')
+const templatePath = require('../lib/project-path');
+
+/**
+ * Usage.
+ */
+
+program
+  .usage('[project-name]')
+
+program.parse(process.argv)
+
+let projectName = program.args[0]; // 项目名
+
+/**
+ * 需要用户选择的项
+ *
+ * */
+const promptList = [
+  {
+    type: "rawlist",
+    message: "网站类型：",
+    name: "type",
+    choices: [ "官网", "后台管理系统" ],
+    // default: '后台管理系统'
+  },
+  {
+    type: 'confirm',
+    name: 'permission',
+    message: '是否纯净?',
+    default: true
+  }
+];
+
+// 开始询问用户
+inquirer.prompt(promptList).then(answers => {
+  // 开始下载
+  downloadAndGenerate(answers);
+}).catch(
+  console.log('报错')
+)
+
+/**
+ * @method downloadAndGenerate 下载github上的地址
+ *
+ * */
+const downloadAndGenerate = (answers) => {
+  const spinner = ora('开始拉取模板')
+  spinner.start()
+  const path = templatePath(answers);
+  let url = `ClownsMan/${path}`, clone = false;
+  downLoad(url, projectName, {
+      clone
+  }, err => {
+      spinner.stop()
+      console.log(err?err:"项目创建成功")
+      process.exit(1)
+  })
+}
