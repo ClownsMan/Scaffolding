@@ -5,6 +5,7 @@ const inquirer = require('inquirer');
 const downLoad = require('download-git-repo')
 const ora = require('ora')
 const templatePath = require('../lib/project-path');
+const chalk = require('chalk');
 
 /**
  * Usage.
@@ -26,7 +27,7 @@ const promptList = [
     type: "rawlist",
     message: "网站类型：",
     name: "type",
-    choices: [ "官网", "后台管理系统" ],
+    choices: [ "官网", "后台管理系统", "template" ],
     // default: '后台管理系统'
   },
   {
@@ -58,7 +59,11 @@ const downloadAndGenerate = (answers) => {
       clone
   }, err => {
       spinner.stop()
-      console.log(err?err:"项目创建成功")
+      if(err) {
+        console(chalk.red('项目创建失败'))
+      }else {
+        console.log(chalk.green("项目创建成功"))
+      }
       process.exit(1)
   })
 }
